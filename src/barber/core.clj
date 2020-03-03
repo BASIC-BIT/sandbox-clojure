@@ -7,27 +7,22 @@
 (require 'barber.barber)
 (alias 'barber 'barber.barber)
 
-
-(defn getCurMs [] (inst-ms (java.util.Date.)))
-(defn start [] (def startTime (getCurMs)))
-(defn getRuntimeMs [] (- (getCurMs) startTime))
-(defn hasBeenRunningFor10Seconds? [] (> (getRuntimeMs) 10000))
-(defn hasBeenRunningForLessThan10Seconds? [] (not (hasBeenRunningFor10Seconds?)))
+(require 'barber.time)
+(alias 'time 'barber.time)
 
 (defn genCustomerLoop [chair waitingRoom] (future (loop [] (do
                                                     (Thread/sleep (+ 10 (rand-int 21)))
                                                     (waiting-room/newCustomer waitingRoom)
                                                     (barber/startHaircut chair waitingRoom)
-                                                    (if (hasBeenRunningForLessThan10Seconds?) (recur))
+                                                    (if (time/hasBeenRunningForLessThan10Seconds?) (recur))
                                                     ))))
 
 (defn -main
       "I don't do a whole lot ... yet."
       [& args]
       (do
-        (start)
+        (time/start)
         (def waitingRoom (waiting-room/create))
         (def chair (barber/createChair))
-        (genCustomerLoop chair waitingRoom)
-        ()
+        (await (genCustomerLoop chair waitingRoom))
         ))

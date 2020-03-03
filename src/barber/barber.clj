@@ -3,6 +3,9 @@
 (require 'barber.waiting-room)
 (alias 'waiting-room 'barber.waiting-room)
 
+(require 'barber.time)
+(alias 'time 'barber.time)
+
 (defn createChair [] (atom {:filled false :cut-count 0}))
 
 (defn fillChair [chair] (swap! chair assoc :filled true))
@@ -14,7 +17,7 @@
 (defn isChairFilled [chair] (@chair :filled))
 (defn isChairEmpty [chair] (not (isChairFilled chair)))
 
-(defn canAcceptCustomer [chair waitingRoom] (and (isChairEmpty chair) (waiting-room/fetchCustomer waitingRoom)))
+(defn canAcceptCustomer [chair waitingRoom] (and (isChairEmpty chair) (waiting-room/fetchCustomer waitingRoom) (time/hasBeenRunningForLessThan10Seconds?)))
 
 (defn startHaircut [chair waitingRoom] (future (if (canAcceptCustomer chair waitingRoom)
                                                  (do
